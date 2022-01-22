@@ -1,4 +1,4 @@
-package day_22_01_21;
+package Ex_22_01_21;
 
 import java.util.Arrays;
 
