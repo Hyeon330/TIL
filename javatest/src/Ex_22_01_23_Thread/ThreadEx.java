@@ -1,4 +1,4 @@
-package Ex_22_01_24;
+package Ex_22_01_23_Thread;
 
 import java.util.Iterator;
 import java.util.Map;

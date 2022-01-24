@@ -1,4 +1,4 @@
-package Ex_22_01_22;
+package Ex_22_01_22_CollFramWork;
 
 import java.util.*;
 import static java.util.Collections.*;
