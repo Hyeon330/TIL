@@ -407,3 +407,172 @@ class RunImplEx16 implements Runnable {
         stopped = true;
     }
 }
+
+class ThreadEx18 {
+    public static void main(String[] args) {
+        ThreadEx18_1 th1 = new ThreadEx18_1("*");
+        ThreadEx18_1 th2 = new ThreadEx18_1("**");
+        ThreadEx18_1 th3 = new ThreadEx18_1("***");
+        th1.start();
+        th2.start();
+        th3.start();
+
+        try {
+            Thread.sleep(2000);
+            th1.suspend();
+            Thread.sleep(2000);
+            th2.suspend();
+            Thread.sleep(3000);
+            th1.resume();
+            Thread.sleep(3000);
+            th1.stop();
+            th2.stop();
+            Thread.sleep(2000);
+            th3.stop();
+        } catch (InterruptedException e) {
+        }
+    }
+}
+
+class ThreadEx18_1 implements Runnable {
+    boolean suspended = false;
+    boolean stopped = false;
+
+    Thread th;
+
+    ThreadEx18_1(String name) {
+        th = new Thread(this, name); // Thread(Runnable r, String name)
+    }
+
+    @Override
+    public void run() {
+        String name = th.getName();
+
+        while (!stopped) {
+            if (!suspended) {
+                System.out.println(name);
+
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    System.out.println(name + " - interrupted");
+                }
+            } else {
+                Thread.yield();
+            }
+        }
+        System.out.println(name + " - stopped");
+    }
+
+    public void suspend() {
+        suspended = true;
+        th.interrupt();
+        System.out.println(th.getName() + " - interrupt() by suspend()");
+    }
+
+    public void stop() {
+        stopped = true;
+        th.interrupt();
+        System.out.println(th.getName() + " - interrupt() by stop()");
+    }
+
+    public void resume() {
+        suspended = true;
+    }
+
+    public void start() {
+        th.start();
+    }
+}
+
+class ThreadEx19 {
+    static long startTime = 0;
+
+    public static void main(String[] args) {
+        ThreadEx19_1 th1 = new ThreadEx19_1();
+        ThreadEx19_2 th2 = new ThreadEx19_2();
+        th1.start();
+        th2.start();
+        startTime = System.currentTimeMillis();
+
+        try {
+            th1.join(); // main쓰레드가 th1의 작업이 끝날 때까지 기다린다.
+            th2.join(); // main쓰레드가 th2의 작업이 끝날 때까지 기다린다.
+        } catch (InterruptedException e) {
+
+        }
+        System.out.print("소요시간:" + (System.currentTimeMillis() - ThreadEx19.startTime));
+    }
+}
+
+class ThreadEx19_1 extends Thread {
+    @Override
+    public void run() {
+        for (int i = 0; i < 300; i++) {
+            System.out.print(new String("-"));
+        }
+    }
+}
+
+class ThreadEx19_2 extends Thread {
+    @Override
+    public void run() {
+        for (int i = 0; i < 300; i++) {
+            System.out.print(new String("|"));
+        }
+    }
+}
+
+class ThreadEx20 {
+    public static void main(String[] args) {
+        ThreadEx20_1 gc = new ThreadEx20_1();
+        gc.setDaemon(true);
+        gc.start();
+
+        int requiredMemory = 0;
+
+        for (int i = 0; i < 20; i++) {
+            requiredMemory = (int) (Math.random() * 10) * 20;
+
+            // 필요한 메모리가 사용할 수 있는 양보다 크거나 전체 메모리의 60%이상을
+            // 사용했을 경우 gc를 꺠운다.
+            if (gc.freeMemory() < requiredMemory || gc.freeMemory() < gc.totalMemory() * 0.4) {
+                gc.interrupt(); // 잠자고 있는 쓰레드 gc를 깨운다.
+            }
+
+            gc.usedMemory += requiredMemory;
+            System.out.println("usedMemory:" + gc.usedMemory);
+        }
+    }
+}
+
+class ThreadEx20_1 extends Thread {
+    final static int MAX_MEMORY = 1000;
+    int usedMemory = 0;
+
+    @Override
+    public void run() {
+        while (true) {
+            try {
+                Thread.sleep(10 * 1000); // 10초
+            } catch (InterruptedException e) {
+                System.out.println("Awaken by interrupt().");
+            }
+
+        }
+    }
+
+    public void gc() {
+        usedMemory -= 300;
+        if (usedMemory < 0)
+            usedMemory = 0;
+    }
+
+    public int totalMemory() {
+        return MAX_MEMORY;
+    }
+
+    public int freeMemory() {
+        return MAX_MEMORY - usedMemory;
+    }
+}
