@@ -3,6 +3,7 @@ package Ex_22_01_29_Stream;
 import java.util.*;
 import java.util.stream.*;
 import static java.util.stream.Collectors.*;
+import static java.util.Comparator.*;
 
 class StreamEx6 {
     public static void main(String[] args) {
@@ -26,6 +27,12 @@ class StreamEx6 {
 
         for (Student s : stuArr2)
             System.out.println(s);
+
+        // Map<String, Student> stuMap = Stream.of(stuArr)
+        // .collect(Collectors.toMap(s -> s.getName(), p -> p));
+
+        // for (String name : stuMap.keySet())
+        // System.out.println(name + "-" + stuMap.get(name));
 
         long count = Stream.of(stuArr).collect(counting());
         long totalScore = Stream.of(stuArr)
